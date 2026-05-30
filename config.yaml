@@ -1,29 +1,47 @@
 # BioMaster settings
-    # support main model:
-    # o3-mini, o1, gpt-4o, o3-mini-2025-01-31, o1-2024-12-17
-    # claude-3-7-sonnet-thinking, claude-3-7-sonnet-20250219, claude-3-5-sonnet-20241022
-    # DeepSeek-V3, Deepseek-R1
-    # Qwen/QWQ-32B 
-    # LLAMA3-70B
-    # All other models can be tried, but it is suggested that if the main model chooses a better model, 
-    # the best model tested at present is o3-mini-2025-01-31
+    # Experimental model configuration reported in the original config:
+    # main model: o1-2024-12-17
+    # embedding model: text-embedding-ada-002
 
-    # support tool model:
-    # All LLMS can be tried, and you can choose some small models here.
+    # Supported main model examples:
+    # OpenAI: gpt-4o, gpt-4.1, o3, o4-mini
+    # Anthropic-compatible: claude-opus-4-20250514, claude-sonnet-4-20250514,
+    # claude-3-7-sonnet-20250219, claude-3-5-sonnet-20241022
+    # DeepSeek: deepseek-chat, deepseek-reasoner, deepseek-ai/DeepSeek-V3,
+    # deepseek-ai/DeepSeek-R1
+    # Qwen/DashScope/SiliconFlow: qwen-plus, qwen-max, Qwen/QwQ-32B,
+    # Qwen/Qwen2.5-72B-Instruct
+    # Meta/Ollama: meta-llama/Llama-3.3-70B-Instruct, llama3:70b, qwen3:32b
+    # Other OpenAI-compatible chat models can also be tried. For better planning
+    # and debugging, the main model should be a stronger reasoning model.
 
-    # support emmbedding model
-    # text-embedding-004,
-    # text-embedding-3-large, text-embedding-3-small,
-    # text-embedding-ada-002
-    # BAAI/bge-m3
+    # Supported tool model examples:
+    # Use the same model as main, or choose a smaller/faster chat model for
+    # tool-calling and formatting tasks.
 
-    # suggest base url:
-    # https://api.bltcy.ai/v1
-    # https://gpt-api.hkust-gz.edu.cn/v1
+    # Supported embedding model examples:
+    # OpenAI: text-embedding-3-large, text-embedding-3-small, text-embedding-ada-002
+    # Google: text-embedding-004
+    # BAAI/Ollama: BAAI/bge-m3, bge-m3
+    # The embedding model must match the embedding API/base URL or local Ollama setup.
+
+    # Suggested base URLs:
     # https://dashscope.aliyuncs.com/compatible-mode/v1
     # https://api.openai.com/v1
     # https://api.siliconflow.cn/v1
     # https://sg.uiuiapi.com/v1
+    #
+    # Configuration guide:
+    # api.main: API key and OpenAI-compatible base URL for main/tool models.
+    # api.embedding: API key and base URL for the embedding model.
+    # api.ollama: local Ollama service config; used when biomaster.use_ollama is true.
+    # models.main: model used for planning, execution, checking, and debugging.
+    # models.tool: optional cheaper/faster model; defaults to main if omitted.
+    # models.embedding: embedding model used by RAG retrieval.
+    # biomaster.id: unique task ID; outputs are written under this ID.
+    # biomaster.generate_plan: true to generate a new plan; false to reuse/edit one.
+    # data.files: each item should be "path: description".
+    # data.goal: natural-language analysis goal for the workflow.
 api:
   main:
     key: ''

@@ -297,33 +297,51 @@ The example code is located in the `./examples/` folder.
      ```
 
 
-```python
+```yaml
 # BioMaster settings
-    # support main model:
-    # o3-mini, o1, gpt-4o, o3-mini-2025-01-31, o1-2024-12-17
-    # claude-3-7-sonnet-thinking, claude-3-7-sonnet-20250219, claude-3-5-sonnet-20241022
-    # DeepSeek-V3, Deepseek-R1
-    # Qwen/QWQ-32B 
-    # LLAMA3-70B
-    # All other models can be tried, but it is suggested that if the main model chooses a better model, 
-    # the best model tested at present is o3-mini-2025-01-31
+    # Experimental model configuration reported in the original config:
+    # main model: o1-2024-12-17
+    # embedding model: text-embedding-ada-002
 
-    # support tool model:
-    # All LLMS can be tried, and you can choose some small models here.
+    # Supported main model examples:
+    # OpenAI: gpt-4o, gpt-4.1, o3, o4-mini
+    # Anthropic-compatible: claude-opus-4-20250514, claude-sonnet-4-20250514,
+    # claude-3-7-sonnet-20250219, claude-3-5-sonnet-20241022
+    # DeepSeek: deepseek-chat, deepseek-reasoner, deepseek-ai/DeepSeek-V3,
+    # deepseek-ai/DeepSeek-R1
+    # Qwen/DashScope/SiliconFlow: qwen-plus, qwen-max, Qwen/QwQ-32B,
+    # Qwen/Qwen2.5-72B-Instruct
+    # Meta/Ollama: meta-llama/Llama-3.3-70B-Instruct, llama3:70b, qwen3:32b
+    # Other OpenAI-compatible chat models can also be tried. For better planning
+    # and debugging, the main model should be a stronger reasoning model.
 
-    # support emmbedding model
-    # text-embedding-004,
-    # text-embedding-3-large, text-embedding-3-small,
-    # text-embedding-ada-002
-    # BAAI/bge-m3
+    # Supported tool model examples:
+    # Use the same model as main, or choose a smaller/faster chat model for
+    # tool-calling and formatting tasks.
 
-    # suggest base url:
-    # https://api.bltcy.ai/v1
-    # https://gpt-api.hkust-gz.edu.cn/v1
+    # Supported embedding model examples:
+    # OpenAI: text-embedding-3-large, text-embedding-3-small, text-embedding-ada-002
+    # Google: text-embedding-004
+    # BAAI/Ollama: BAAI/bge-m3, bge-m3
+    # The embedding model must match the embedding API/base URL or local Ollama setup.
+
+    # Suggested base URLs:
     # https://dashscope.aliyuncs.com/compatible-mode/v1
     # https://api.openai.com/v1
     # https://api.siliconflow.cn/v1
     # https://sg.uiuiapi.com/v1
+    #
+    # Configuration guide:
+    # api.main: API key and OpenAI-compatible base URL for main/tool models.
+    # api.embedding: API key and base URL for the embedding model.
+    # api.ollama: local Ollama service config; used when biomaster.use_ollama is true.
+    # models.main: model used for planning, execution, checking, and debugging.
+    # models.tool: optional cheaper/faster model; defaults to main if omitted.
+    # models.embedding: embedding model used by RAG retrieval.
+    # biomaster.id: unique task ID; outputs are written under this ID.
+    # biomaster.generate_plan: true to generate a new plan; false to reuse/edit one.
+    # data.files: each item should be "path: description".
+    # data.goal: natural-language analysis goal for the workflow.
 api:
   main:
     key: ''
@@ -349,7 +367,7 @@ biomaster:
   executor: true
   id: '005'
   generate_plan: true
-  use_ollama: false  
+  use_ollama: true   
 
 # datalist and goal
 data:
@@ -360,16 +378,16 @@ data:
   goal: 'please do WGS/WES data analysis Somatic SNV+indel calling.'  
 ```
 ### How to Use Local LLM
-1. start ollama server:
+1. Start Ollama server:
 ```bash
-ollama Serve
+ollama serve
 ```
 2. Download the model:
 ```bash
 ollama run llama3:70b
 ```
 3. If you want to use local LLM, you can set the following settings in `config.yaml`:
-```python
+```yaml
 ollama:
     enabled: true
     base_url: 'http://localhost:11434'
@@ -388,7 +406,7 @@ biomaster:
   generate_plan: true
   use_ollama: true 
 ```
-Note: If you want to use local LLM, suggest you choose the model which more than 30B.
+Note: If you want to use a local LLM, we suggest choosing a model with more than 30B parameters.
 
 #### How to Read the Output
 
@@ -422,9 +440,9 @@ Biomaster stores all output files in the `./output/` directory.
 
 1. **Stop the running task**.
 
-2. Comment out the following line in `config.yaml`:
-   ```python
-   generate_plan: true->false
+2. Change the following setting in `config.yaml`:
+   ```yaml
+   generate_plan: false
    ```
    This will prevent Biomaster from generating a new plan.
 
@@ -462,36 +480,36 @@ Biomaster stores all output files in the `./output/` directory.
    ```bash
    python run.py
    ```
-#### How to use current result start a new task
-example:
+#### How to Use Current Results to Start a New Task
+Example:
 
 If you use task `001` to generate a result:
-current result:
+Current result:
 ```sh
 ./output/001/example.h5ad
 ```
-you want use this result to visualize:
+If you want to use this result for visualization:
 
 1. **Stop the running task**.
 
 2. **Modify the goal** in `config.yaml`:
-   ```python
-   goal:'I want to visualize the result, this result is ./output/001/example.h5ad, which is a h5ad file, single cell data which is after normalization and quality control.'
+   ```yaml
+   goal: 'I want to visualize the result, this result is ./output/001/example.h5ad, which is a h5ad file, single cell data which is after normalization and quality control.'
    ```
 
 3. **Modify the input data** in `config.yaml`:
 
-```python
+```yaml
 data:
   files: 
     - './output/001/example.h5ad: a h5ad file, single cell data which is after normalization and quality control.'
 ```
 4. **Modify the task id** in `config.yaml`:
-   ```python
-   ids='002'
+   ```yaml
+   id: '002'
    ```
 
-3. **Run the script again**:
+5. **Run the script again**:
    ```bash
    python run.py
    ```
